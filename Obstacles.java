@@ -7,10 +7,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
-import java.awt.*;
 
 public class Obstacles extends Pane {
-    String laser2image = getClass().getResource("Лазер2.png").toExternalForm();
+    String laser1image = getClass().getResource("Лазер1.png").toExternalForm();
+    String laser3image = getClass().getResource("Лазер3.png").toExternalForm();
     public Point2D velocity;
     Rectangle rect;
     public int width;
@@ -28,10 +28,10 @@ public class Obstacles extends Pane {
         this.rect.setFill(Color.RED);
     }
     public void SetElectroLaser(){
-        rect.setFill(new ImagePattern(new Image(laser2image),0,0,24,4,true));
+        rect.setFill(new ImagePattern(new Image(laser3image),0,0,1.1,1,true));
     }
     public void SetLaser(){
-        rect.setFill(new ImagePattern(new Image(laser2image),0,0,24,4,true));
+        rect.setFill(new ImagePattern(new Image(laser1image),0,0,1,1.21,true));
     }
     public void Move(int y) {
         velocity = new Point2D(0,y);
