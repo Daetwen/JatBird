@@ -15,7 +15,7 @@ public class LocalBonus extends Pane {
         this.height = height;
         this.width = width;
         rect = new Rectangle(width,height);
-        rect.setFill(new ImagePattern(new Image(image),0,0,11,7,true));
+        rect.setFill(new ImagePattern(new Image(image),0,0,1,1,true));
         getChildren().add(rect);
     }
 }
