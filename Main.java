@@ -57,7 +57,7 @@ public class Main extends Application {
         imgg.setFitHeight(600);
         imgg.setFitWidth(763);
         gameRoot.getChildren().add(imgg);
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 40; i++) {
             Image image2 = new Image(getClass().getResourceAsStream("Коридор.jpg"));
             ImageView imggg = new ImageView(image2);
             imggg.setFitHeight(600);
@@ -69,27 +69,27 @@ public class Main extends Application {
             int width = 600;
             int height = 75;
             Obstacles obstacle = new Obstacles(width,height);
-            obstacle.SetLaser();
+            //obstacle.SetLaser();
             obstacle.setTranslateX(i*1500 + 600);
-            obstacle.setTranslateY(0);
+            obstacle.setTranslateY(Math.random()*100+20);
             obstacles.add(obstacle);
 
             Obstacles obstalce2 = new Obstacles(width,height);
-            obstalce2.SetLaser();
+            //obstalce2.SetLaser();
             obstalce2.setTranslateX(i*1500 + 600);
-            obstalce2.setTranslateY(height + enter);
+            obstalce2.setTranslateY(Math.random()*100 + height + enter);
             obstacles.add(obstalce2);
 
             Obstacles obstalce3 = new Obstacles(width,height);
-            obstalce3.SetLaser();
+            //obstalce3.SetLaser();
             obstalce3.setTranslateX(i*1500 + 600);
-            obstalce3.setTranslateY(2*height+2*enter);
+            obstalce3.setTranslateY(Math.random()*150 + 2*height+2*enter);
             obstacles.add(obstalce3);
 
             Obstacles obstalce4 = new Obstacles(35,175);
             obstalce4.SetElectroLaser();
             obstalce4.setTranslateX(i*1500 + 1600);
-            obstalce4.setTranslateY(100);
+            obstalce4.setTranslateY(400);
             obstacles.add(obstalce4);
 
             gameRoot.getChildren().addAll(obstacle,obstalce2,obstalce3,obstalce4);
