@@ -3,6 +3,7 @@ package sample;
 import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.FillTransition;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -29,12 +30,9 @@ import java.util.Random;
 
 public class Main extends Application {
 
-    public enum GameState{
-        READY,RUNNING,GAMEOVER;
-    }
-
     public static Pane appRoot = new Pane();
     public static Pane gameRoot = new Pane();
+    Person person = new Person();
 
     BorderPane root = new BorderPane();
     HBox hbox = new HBox(2);
@@ -44,80 +42,82 @@ public class Main extends Application {
     public static ArrayList<Obstacles> obstacles = new ArrayList<>();
     public static ArrayList<MyCoin> coins = new ArrayList<>();
     public static ArrayList<LocalBonus> bonuses = new ArrayList<>();
-    Person person = new Person();
-    public static int score = 0;
+    public static double score = 0;
     public static int coin_score = 0;
     public Label scoreLabel = new Label("Score: "+ score);
     public Label scoreLabel2 = new Label("Coins: "+ coin_score);
 
+    public void PrintObstacle(Obstacles obstacle, int width, int height, int i, int x1, int x2, double y1, int y2){
+        obstacle.SetLaser();
+        obstacle.setTranslateX(i*x1 + x2);
+        obstacle.setTranslateY(Math.random()*y1+y2);
+        obstacles.add(obstacle);
+    }
+
+    public ImageView PrintImage(String name,int Height,int Width){
+        Image image = new Image(getClass().getResourceAsStream(name));
+        ImageView img = new ImageView(image);
+        img.setFitHeight(Height);
+        img.setFitWidth(Width);
+        return img;
+    }
+
+    //Функция создания, добавления в коллекции и добавления на основной Pane игровых объектов
     public Parent createContent() {
+
         gameRoot.setPrefSize(600,600);
-        Image image1 = new Image(getClass().getResourceAsStream("Начало.jpg"));
-        ImageView imgg = new ImageView(image1);
-        imgg.setFitHeight(600);
-        imgg.setFitWidth(763);
+        ImageView imgg = PrintImage("Начало.jpg",600,763);  //Добавление картинки начала уровня
         gameRoot.getChildren().add(imgg);
-        for(int i = 0; i < 35; i++) {
-            Image image2 = new Image(getClass().getResourceAsStream("Коридор.jpg"));
-            ImageView imggg = new ImageView(image2);
-            imggg.setFitHeight(600);
-            imggg.setFitWidth(1500);
+
+        for(int i = 0; i < 50; i++) {               //Добавление картинки корридора каждые 1500 пикселей после начальной
+            ImageView imggg = PrintImage("Коридор.jpg",600,1500);
             imggg.setTranslateX((i)*1500 + 763);
             gameRoot.getChildren().add(imggg);
 
-            int enter = 100;
-            int width = 600;
-            int height = 50;
+            int enter = 100;                      //Добавление корриборов из панелек с лазерами, где корридоры создаются
+            int width = 600;                      //блоками по 3 лазера
+            int height = 50;                      //Создание непосредственно 3 объектов лазеров
             Obstacles obstacle = new Obstacles(width,height);
-            obstacle.SetLaser();
-            obstacle.setTranslateX(i*1500 + 600);
-            obstacle.setTranslateY(Math.random()*100+20);
-            obstacles.add(obstacle);
+            PrintObstacle(obstacle, width,height,i,1500,600,100,20);
+            Obstacles obstacle2 = new Obstacles(width,height);
+            PrintObstacle(obstacle2, width,height,i,1500,600,Math.random()*100,height + enter);
+            Obstacles obstacle3 = new Obstacles(width,height);
+            PrintObstacle(obstacle3, width,height,i,1500,600,Math.random()*150,2*height+2*enter);
 
-            Obstacles obstalce2 = new Obstacles(width,height);
-            obstalce2.SetLaser();
-            obstalce2.setTranslateX(i*1500 + 600);
-            obstalce2.setTranslateY(Math.random()*100 + height + enter);
-            obstacles.add(obstalce2);
-
-            Obstacles obstalce3 = new Obstacles(width,height);
-            obstalce3.SetLaser();
-            obstalce3.setTranslateX(i*1500 + 600);
-            obstalce3.setTranslateY(Math.random()*150 + 2*height+2*enter);
-            obstacles.add(obstalce3);
-
-            Obstacles obstalce4 = new Obstacles(35,350);
+            Obstacles obstalce4 = new Obstacles(35,350);     //Создание вертикального электролазера
             obstalce4.SetElectroLaser();
             obstalce4.setTranslateX(i*1500 + 1600);
             obstalce4.setTranslateY(250);
             obstacles.add(obstalce4);
 
-            gameRoot.getChildren().addAll(obstacle,obstalce2,obstalce3,obstalce4);
+            gameRoot.getChildren().addAll(obstacle,obstacle2,obstacle3,obstalce4); //Добавление для отображения
         }
-        for(int i = 0;i < 20;i++){
+        for(int i = 0;i < 20;i++){                                //Цикл создания и спавна бонуса
             LocalBonus bonus = new LocalBonus(50,50);
             bonus.setTranslateX(i*5000+2500);
-            bonus.setTranslateY(300);
+            bonus.setTranslateY(Math.random()*420);
             bonuses.add(bonus);
 
-            gameRoot.getChildren().addAll(bonus);
+            gameRoot.getChildren().addAll(bonus);                //Добавление бонуса для отображения
         }
-        for(int i = 0;i < 400;i++) {
+        for(int i = 0;i < 400;i++) {                            //Цикл создания и спавна монеток
             MyCoin coin = new MyCoin(13);
             coin.setTranslateX(i*85+600);
             coin.setTranslateY(200);
             coins.add(coin);
 
-            gameRoot.getChildren().addAll(coin);
+            gameRoot.getChildren().addAll(coin);               //Добавление монеток для отображения
         }
 
-        gameRoot.getChildren().add(person);
-        appRoot.getChildren().addAll(gameRoot);
+        gameRoot.getChildren().add(person);                    //добавление персонажа
+        appRoot.getChildren().addAll(gameRoot);                //Добавление всего на главный Pane
         return appRoot;
     }
+
+    //Функция обновления положения птички
     public void update() {
-        if(person.velocity.getY()<5){
-            person.velocity = person.velocity.add(0,1);
+        if(person.velocity.getY()<15) {
+            person.velocity = person.velocity.add(0, 1);
         }
         person.moveX((int)person.velocity.getX());
         person.moveY((int)person.velocity.getY());
@@ -129,12 +129,63 @@ public class Main extends Application {
         });
     }
 
+    //Функция непосредственно геимплея
+    public void Play(Stage primaryStage,Scene menu,double x,double y){
+        Person.levelmodX = x;
+        Person.levelmodY = y;
+        Scene scene = new Scene(createContent());        //Создание сцены с игровыми объектами
+        gameRoot.getChildren().add(root);                //Добавление на сцену кнопок
+        scene.setOnKeyPressed(key->{
+            KeyCode keyCode = key.getCode();
+                                                         //На Ctrl использовать буст на скорость с тратой монет
+            if (keyCode.equals(KeyCode.CONTROL)) {
+                if(coin_score >= 35){
+                    person.jump(8,30);
+                    coin_score = coin_score - 35;
+                }
+                return;
+            }
+                                                         //На W подниматься объектом вверх
+            if (keyCode.equals(KeyCode.W)) {
+                person.jump(2.5,18);
+                return;
+            }
+            if(keyCode.equals(KeyCode.ESCAPE)){
+            }
+        });
+                                                          //Обновление и показ сцены
+        primaryStage.setTitle("JatBird");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+                                                          //Вызов обновления непосредственно карты и игровых объектов
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                update();
+//                    if(person.Death() == true){
+//                        primaryStage.setTitle("Menu");
+//                        primaryStage.setScene(menu);
+//                        primaryStage.show();
+//                        person.count = false;
+//                        restart();
+//                    }
+            }
+        };
+        timer.start();
+    }
+
+    //Функция обновления полей и коллекция перед стартом новой игры после смерти
     public void restart(){
         obstacles.clear();
+        coins.clear();
+        bonuses.clear();
         score = 0;
         coin_score = 0;
         person = new Person();
     }
+
+    //Функция создания кнопки с задаваемым именем определённых размеров
     private Button addButton(String name){
         Button button = new Button(name);
         button.setPrefSize(100,20);
@@ -145,42 +196,50 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Pane menu_pane = new Pane();
         Scene menu = new Scene(menu_pane);
-        Image image = new Image(getClass().getResourceAsStream("фон.jpg"));
-        ImageView imgg = new ImageView(image);
-        imgg.setFitHeight(600);
-        imgg.setFitWidth(600);
+        ImageView imgg = PrintImage("Фон главного меню2.jpg",600,600);
         menu_pane.getChildren().add(imgg);
-        Rectangle black = new Rectangle(200,200, Color.BLACK);
-        black.setTranslateX(200);
-        menu_pane.getChildren().add(black);
+//        Rectangle black = new Rectangle(200,200, Color.BLACK);
+//        black.setTranslateX(200);
+//        menu_pane.getChildren().add(black);
 
+        //Создание блоков меню
+        //Главное меню
         MenuItem newGame = new MenuItem("НОВАЯ ИГРА");
         MenuItem options = new MenuItem("НАСТРОЙКИ");
         MenuItem records= new MenuItem("РЕКОРДЫ");
         MenuItem exit = new MenuItem("ВЫХОД");
         SubMenu mainMenu = new SubMenu(newGame,options,records,exit);
 
+        //Меню настроек
         MenuItem sound = new MenuItem("ВКЛ/ВЫКЛ МУЗЫКУ");
         MenuItem volume = new MenuItem("ГРОМКОСТЬ");
         MenuItem casee = new MenuItem("УПРАВЛЕНИЕ");
         MenuItem exit2 = new MenuItem("НАЗАД");
         SubMenu optionsMenu = new SubMenu(sound,volume,casee,exit2);
 
-        MenuItem one = new MenuItem("ОДИН ИГРОК");
-        MenuItem two = new MenuItem("ДВА ИГРОКА");
+        //Меню выбора сложности игры
+        MenuItem one = new MenuItem("ЛЕГКИЙ УРОВЕНЬ");
+        MenuItem two = new MenuItem("СРЕДНИЙ УРОВЕНЬ");
+        MenuItem three = new MenuItem("ТЯЖЁЛЫЙ УРОВЕНЬ");
+        MenuItem fore = new MenuItem("УРОВЕНЬ ДЛЯ ПСИХОВ");
         MenuItem exit3 = new MenuItem("НАЗАД");
-        SubMenu newGameMenu = new SubMenu(one,two,exit3);
+        SubMenu newGameMenu = new SubMenu(one,two,three,fore,exit3);
 
         MenuBox menuBox = new MenuBox(mainMenu);
-        //MenuBox optionsBox = new MenuBox(optionsMenu);
-       // MenuBox newGameBox = new MenuBox(newGameMenu);
 
+        //Переходы из меню в разные разделы и обратно по нажатии нужного пункта
         newGame.setOnMouseClicked(event->menuBox.setSubMenu(newGameMenu));
         options.setOnMouseClicked(event->menuBox.setSubMenu(optionsMenu));
         exit.setOnMouseClicked(event-> System.exit(0));
         exit2.setOnMouseClicked(event->menuBox.setSubMenu(mainMenu));
         exit3.setOnMouseClicked(event->menuBox.setSubMenu(mainMenu));
         menu_pane.getChildren().add(menuBox);
+
+        //Запуск игры с установкой параметров сложности
+        one.setOnMouseClicked(event->Play(primaryStage,menu,1,1.6));
+        two.setOnMouseClicked(event->Play(primaryStage,menu,1.2,1.8));
+        three.setOnMouseClicked(event->Play(primaryStage,menu,1.5,2.1));
+        fore.setOnMouseClicked(event->Play(primaryStage,menu,2,2.7));
 
         primaryStage.setTitle("Menu");
         primaryStage.setScene(menu);
@@ -197,94 +256,6 @@ public class Main extends Application {
                 coin_score = coin_score - 35;
             }
         });
-
-
-        Scene scene = new Scene(createContent());
-        one.setOnMouseClicked(event->{
-            gameRoot.getChildren().add(root);
-            scene.setOnKeyPressed(key->{
-                KeyCode keyCode = key.getCode();
-                if (keyCode.equals(KeyCode.CONTROL)) {
-                    if(coin_score >= 35){
-                        person.jump(8,30);
-                        coin_score = coin_score - 35;
-                    }
-                    return;
-                }
-                if (keyCode.equals(KeyCode.W)) {
-                    person.jump(2.5,20);
-                    return;
-                }
-            });
-            //scene.setOnMousePressed(event2->{person.jump(1);});
-            primaryStage.setTitle("JatBird");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-
-
-            AnimationTimer timer = new AnimationTimer() {
-                @Override
-                public void handle(long now) {
-                    update();
-/*                    if(person.Death() == true){
-                        primaryStage.setTitle("Menu");
-                        primaryStage.setScene(menu);
-                        primaryStage.show();
-                        person.count = false;
-                        restart();
-                    }*/
-                }
-            };
-            timer.start();
-        });
-    }
-
-
-    private static class MenuItem extends StackPane {
-        public MenuItem(String name){
-            Rectangle rect = new Rectangle(200,40,Color.BLACK);
-            Text text = new Text(name);
-            text.setFill(Color.WHITE);
-            text.setFont(Font.font("TimesNewRoman", FontWeight.BOLD, 8));
-
-             this.setAlignment(Pos.CENTER);
-             getChildren().addAll(rect,text);
-            FillTransition trans = new FillTransition(Duration.seconds(0.5),rect);
-            setOnMouseEntered(event->{
-                trans.setFromValue(Color.BLACK);
-                trans.setToValue(Color.DARKGOLDENROD);
-                trans.setCycleCount(Animation.INDEFINITE);
-                trans.setAutoReverse(true);
-                trans.play();
-            });
-            setOnMouseExited(event->{
-                trans.stop();
-                rect.setFill(Color.BLACK);
-            });
-        }
-    }
-    private static class SubMenu extends VBox{
-        public SubMenu(MenuItem...items){
-            setSpacing(5);
-            setTranslateX(200);
-            setTranslateY(10);
-            for(MenuItem item: items){
-                getChildren().addAll(item);
-            }
-        }
-    }
-    private static class MenuBox extends Pane{
-        static SubMenu subMenu;
-        public MenuBox(SubMenu subMenu){
-            MenuBox.subMenu = subMenu;
-            setVisible(true);
-            getChildren().add(subMenu);
-        }
-        public void setSubMenu(SubMenu subMenu){
-            getChildren().remove(MenuBox.subMenu);
-            MenuBox.subMenu = subMenu;
-            getChildren().add(MenuBox.subMenu);
-        }
     }
 
     public static void main(String[] args) {
