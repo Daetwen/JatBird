@@ -16,7 +16,11 @@ public class Person extends Pane {
     MyCoin removeCoin = null;
     LocalBonus removeBonus = null;
     public static boolean count = false;
+    public static double levelmodY = 2;
+    public static double levelmodX = 1.5;
+    public static double upspeed = 0;
 
+    //Конструктор создания персонажа
     public Person() {
         rect = new Rectangle(51,36,Color.GREEN);
         velocity = new Point2D(0,0);
@@ -24,56 +28,66 @@ public class Person extends Pane {
         setTranslateX(100);
         getChildren().add(rect);
     }
+
+    //Функция проверки движения по вертикали
     public void moveY(int value) {
         boolean moveDown = value>0 ? true:false;
         for (int i = 0;i < Math.abs(value);i++) {
-            for(Obstacles obs: Main.obstacles) {
-                if(this.getBoundsInParent().intersects(obs.getBoundsInParent())) {
-                    if(moveDown) {
-                       setTranslateY(getTranslateY()+1);
+            for(Obstacles obs: Main.obstacles) {//Цикл, не позовляющий вывалится за карту из объектов
+                if(this.getBoundsInParent().intersects(obs.getBoundsInParent())) {//Если пересечение с объектами
+                    if(moveDown) {                            //Возврат вверх, если западание под объект
+                       setTranslateY(getTranslateY()+0.5);
                        return;
                     }
-                    else {
-                        setTranslateY(getTranslateY()-1);
+                    else {                                    //Возврат вниз, если западание выше объекта
+                        setTranslateY(getTranslateY()-0.5);
                         return;
                     }
                 }
             }
         }
-
+        //Не позволяет вывалится за обычную карту сверху и снизу
         if(getTranslateY()<0){
             setTranslateY(0);
         }
         if(getTranslateY()>580){
             setTranslateY(580);
         }
-        this.setTranslateY(getTranslateY() + (moveDown?1:-1));
+        this.setTranslateY(getTranslateY() + (moveDown?levelmodY:-levelmodY));
     }
+
+    //Функция проверки движения по горизонтали
     public void moveX(int value){
         for(int i = 0;i < value;i++){
            for(Obstacles obs : Main.obstacles){
                if(this.getBoundsInParent().intersects(obs.getBoundsInParent())){
-                   if(getTranslateX()+700 == obs.getTranslateX()){
-
-                       setTranslateX(getTranslateX()-1);
+                   if(this.getTranslateX()+1500 == obs.getTranslateX()){
+                       setTranslateX(getTranslateX()-levelmodX);
                        return;
                    }
                }
                IsCoinPicked();
                IsBonusPicked();
-/*               if(getTranslateX() == obs.getTranslateX()+i*700) {
+               /*if(getTranslateX() == obs.getTranslateX()+i*700) {
                    obs.SetColor();
                }*/
            }
-           setTranslateX(getTranslateX()+1);
-            if(getTranslateX()%20 == 0) {
+           setTranslateX(getTranslateX()+levelmodX);
+            if((getTranslateX() - levelmodX)%20 <= 0.1) {
                 Main.score++;
+                upspeed = upspeed + 0.0001;
+                levelmodX += upspeed;
+                levelmodY += upspeed;
             }
         }
     }
-    public void jump(double x,int y) {
+
+    //Функция перемещения персонажа вверх по вертикали и вперёд по горизонтали
+    public void jump(double x,double y) {
         velocity = new Point2D(x,-y);
     }
+
+    //Функция проверки птички на смерть (Написана на данный момент не совсем корректно, будет переписана)
     public boolean Death(){
         int i = 0;
         for(Obstacles obs : Main.obstacles){
@@ -91,22 +105,26 @@ public class Person extends Pane {
         });*/
         return count;
     }
+
+    //Функция проверки сбора монетки
     public void IsCoinPicked(){
-        Main.coins.forEach((coin)->{
-            if(this.getBoundsInParent().intersects(coin.getBoundsInParent())){
+        Main.coins.forEach((coin)->{                                               //Проходим по коллекции монет,
+            if(this.getBoundsInParent().intersects(coin.getBoundsInParent())){     //Если взяли, то накручиваем счётчик
                 removeCoin = coin;
                 Main.coin_score++;
                 System.out.println(Main.coin_score);
             }
-        });
+        });                                                                       //И удаляем из коллекции
         Main.coins.remove(removeCoin);
         Main.gameRoot.getChildren().remove(removeCoin);
     }
+
+    //Функция проверки сбора бонуса(Это бонус на скорость)(будет дорабатываться)
     public void IsBonusPicked(){
-        Main.bonuses.forEach((bonus)->{
-            if(this.getBoundsInParent().intersects(bonus.getBoundsInParent())){
-                removeBonus = bonus;
-                this.jump(15,30);
+        Main.bonuses.forEach((bonus)->{                                          //Аналогично монетке
+            if(this.getBoundsInParent().intersects(bonus.getBoundsInParent())){  //Только вместо накручивания счётчика
+                removeBonus = bonus;                                             //Большой прыжок вперёд
+                this.jump(12,30);
             }
         });
         Main.bonuses.remove(removeBonus);
