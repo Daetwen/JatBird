@@ -65,7 +65,7 @@ public class Main extends Application {
     //Функция создания, добавления в коллекции и добавления на основной Pane игровых объектов
     public Parent createContent() {
 
-        gameRoot.setPrefSize(600,600);
+        gameRoot.setPrefSize(900,900);
         ImageView imgg = PrintImage("Начало.jpg",600,763);  //Добавление картинки начала уровня
         gameRoot.getChildren().add(imgg);
 
@@ -196,7 +196,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Pane menu_pane = new Pane();
         Scene menu = new Scene(menu_pane);
-        ImageView imgg = PrintImage("Фон главного меню2.jpg",600,600);
+        ImageView imgg = PrintImage("Фон главного меню2.jpg",600,900);
         menu_pane.getChildren().add(imgg);
 //        Rectangle black = new Rectangle(200,200, Color.BLACK);
 //        black.setTranslateX(200);
