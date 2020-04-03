@@ -49,11 +49,11 @@ public class Person extends Pane {
             }
         }
         //Не позволяет вывалится за обычную карту сверху и снизу
-        if(getTranslateY()<0){
-            setTranslateY(0);
+        if(getTranslateY()<15){
+            setTranslateY(15);
         }
-        if(getTranslateY()>580){
-            setTranslateY(580);
+        if(getTranslateY()>510){
+            setTranslateY(510);
         }
         this.setTranslateY(getTranslateY() + (moveDown?levelmodY:-levelmodY));
     }
