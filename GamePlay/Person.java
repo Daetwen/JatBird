@@ -20,12 +20,14 @@ public class Person extends Pane {
     public static double levelmodX = 1.5;
     public static double upspeed = 0;
 
+    String image = getClass().getResource("Персонаж.png").toExternalForm();
     //Конструктор создания персонажа
     public Person() {
-        rect = new Rectangle(51,36,Color.GREEN);
+        rect = new Rectangle(50,50);
         velocity = new Point2D(0,0);
         setTranslateY(300);
         setTranslateX(100);
+        rect.setFill(new ImagePattern(new Image(image),0,0,1,1,true));
         getChildren().add(rect);
     }
 
