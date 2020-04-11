@@ -1,22 +1,35 @@
 package sample;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 public class MyCoin extends Pane {
+    /** Объект класса круг */
     Circle circle;
+    /** Переменная ширины объекта (и по горизонтали, и по вертикали) */
     public int width;
-    //String Coinimage = getClass().getResource("Монета.jpg").toExternalForm();
-    public MyCoin(int width)
-    {
-        this.width = width;
-        circle = new Circle(width,Color.YELLOW);
-        //circle.setFill(new ImagePattern(new Image(image),0,0,1,1,true));
-        getChildren().add(circle);
+    /** картинка для отображения */
+    String Coinimage = getClass().getResource("Монетка.png").toExternalForm();
+
+    /**
+     * Конструктор - создание нового объекта с определенными значениями.
+     * @param width - размер объекта.
+     * @throws IllegalArgumentException, если размер объекта меньше нуля.
+     */
+    public MyCoin(int width) {
+        try{
+            if(width < 0)
+                throw new IllegalArgumentException("Число размера монеты меньше 0.");
+            this.width = width;
+            circle = new Circle(width);
+            circle.setFill(new ImagePattern(new Image(Coinimage)));
+            getChildren().add(circle);
+        }
+        catch(Exception ex){
+            ex.getLocalizedMessage();
+            System.exit(1);
+        }
     }
 }
