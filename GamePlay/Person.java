@@ -3,8 +3,12 @@ package sample;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+
+import static sample.Obstacles.isSaved;
 
 public class Person extends Pane {
     /** Объект 2D точка для позиции прыжка */
@@ -15,6 +19,8 @@ public class Person extends Pane {
     MyCoin removeCoin = null;
     /** Объект класса бонус. Создан для выбора удаления объекта бонуса */
     LocalBonus removeBonus = null;
+    /** Объект класса бонус-второй шанс. Создан для выбора удаления объекта бонуса-второго шанса */
+    SecondChansBonus removeSecondChanse = null;
     /** Параметр определения смерти персонажа */
     public static boolean count = false;
     /** Параметр проверки активна ли зона лазера */
@@ -31,6 +37,14 @@ public class Person extends Pane {
     public int height = 25;
     /** картинка для отображения персонажа */
     String image = getClass().getResource("Персонаж.png").toExternalForm();
+    /** Звук перед выстрелом лазера */
+    Media sound1 = new Media(getClass().getResource("До появления.mp3").toString());
+    /** Звук после выстрела лазера */
+    Media sound2 = new Media(getClass().getResource("После появления.mp3").toString());
+    /** объект класса для воспроизведения звуков */
+    public MediaPlayer mp = new MediaPlayer(sound1);
+    /** объект класса для воспроизведения звуков */
+    public MediaPlayer mp2 = new MediaPlayer(sound2);
 
     /**
      * Конструктор - создание персонажа.
@@ -60,8 +74,9 @@ public class Person extends Pane {
             for (int i = 0;i < Math.abs(value);i++) {
                 for(Obstacles obs: Main.obstacles) {//Цикл, не позовляющий вывалится за карту из объектов
                     if(this.getBoundsInParent().intersects(obs.getBoundsInParent()) && active == true){
+                        //obs.StopMP3();
+                        StopMP3();
                         count = true;
-                        obs.StopMP3();
                     }
 //                if(this.getBoundsInParent().intersects(obs.getBoundsInParent())) {//Если пересечение с объектами
 //                    if(moveDown) {                            //Возврат вверх, если западание под объект
@@ -101,9 +116,10 @@ public class Person extends Pane {
                     if(this.getBoundsInParent().intersects(obs.getBoundsInParent())){
                         if(obs.GetWidth() == 30) count = true;
                         if(this.getTranslateX() >= obs.getTranslateX()+112) {
-                            count = true;
+                            //obs.StopMP3();
+                            StopMP3();
                             active = true;
-                            obs.StopMP3();
+                            count = true;
                         }
                         if(obs.getTranslateX()%600 == 0) active = false;
 //                   if(this.getTranslateX()+1500 == obs.getTranslateX()){
@@ -116,14 +132,22 @@ public class Person extends Pane {
 //                    }
                     IsCoinPicked();
                     IsBonusPicked();
+                    IsSecondChansePicked();
                     if(getTranslateX() == obs.getTranslateX()) {
-                        if(obs.GetWidth() != 30) obs.SetStation(width, 1);
+                        if(obs.GetWidth() != 30) {
+                            obs.SetStation(width, 1);
+                            mp.play();
+                        }
                     }
                     else if((getTranslateX() % (obs.getTranslateX()+ 108)) < 1) {
-                        if(obs.GetWidth() != 30) obs.SetStation(width, 2);
+                        if(obs.GetWidth() != 30) {
+                            mp2.play();
+                            obs.SetStation(width, 2);
+                        }
                     }
                     if(this.getTranslateX() % (obs.getTranslateX()+ 600) == 0){
                         if(obs.GetWidth() != 30) obs.SetStation(width, 3);
+                        active = false;
                     }
                 }
                 setTranslateX(getTranslateX()+levelmodX);
@@ -190,5 +214,34 @@ public class Person extends Pane {
             ex.getLocalizedMessage();
             System.exit(1);
         }
+    }
+
+    /**
+     * Функция проверки сбора бонуса на сохранение и сохранение при сборе.
+     */
+    public void IsSecondChansePicked(){
+        try{
+            Main.secondChanses.forEach((secondChans)->{                                          //Аналогично монетке
+                if(this.getBoundsInParent().intersects(secondChans.getBoundsInParent())){  //Только вместо накручивания счётчика
+                    removeSecondChanse = secondChans;                                             //Большой прыжок вперёд
+                    Main.Save("Save.txt");
+                    isSaved = true;
+                }
+            });
+            Main.secondChanses.remove(removeSecondChanse);
+            Main.gameRoot.getChildren().remove(removeSecondChanse);
+        }
+        catch(Exception ex){
+            ex.getLocalizedMessage();
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Функция остановки воспроизведения звуков лазера.
+     */
+    public void StopMP3(){
+        this.mp.stop();
+        this.mp2.stop();
     }
 }
