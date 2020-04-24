@@ -2,8 +2,6 @@ package sample;
 
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -16,14 +14,6 @@ public class Obstacles extends Pane {
     String laser4image = getClass().getResource("Лазер без полосы.png").toExternalForm();
     /** картинка для отображения */
     String laser5image = getClass().getResource("Лазер с тонкой полоской.png").toExternalForm();
-    /** Звук перед выстрелом лазера */
-    Media sound1 = new Media(getClass().getResource("До появления.mp3").toString());
-    /** Звук после выстрела лазера */
-    Media sound2 = new Media(getClass().getResource("После появления.mp3").toString());
-    /** объект класса для воспроизведения звуков */
-    MediaPlayer mp = new MediaPlayer(sound1);
-    /** объект класса для воспроизведения звуков */
-    MediaPlayer mp2 = new MediaPlayer(sound2);
     /** Объект класса прямоугольник */
     Rectangle rect;
     /** Переменная ширины объекта (по горизонтали) */
@@ -63,11 +53,6 @@ public class Obstacles extends Pane {
         return this.width;
     }
 
-    public void StopMP3(){
-        this.mp.stop();
-        this.mp2.stop();
-    }
-
     /**
      * Функция изменения отображения, размера и свойст объекта в зависимости от состаяния.
      * @param width - объект класса-контейнера для всех элементов.
@@ -82,7 +67,6 @@ public class Obstacles extends Pane {
                     if(isSaved == true){
                         rect.setTranslateY(rect.getTranslateY() + 12.5);
                     }
-                    mp.play();
                     rect.setFill(new ImagePattern(new Image(laser5image),0,0,1,0.99,true));
 
                 }
@@ -90,20 +74,16 @@ public class Obstacles extends Pane {
                     rect.setHeight(50);
                     rect.setTranslateY(rect.getTranslateY() - 12.5);
                     rect.setFill(new ImagePattern(new Image(laser1image),0,0,1,1.21,true));
-                    mp2.play();
                 }
                 if(this.station == 3){
                     rect.setHeight(25);
                     rect.setTranslateY(rect.getTranslateY() + 12.5);
                     this.SetLaser();
-                    isSaved = false;
                 }
             }
         }
         catch(Exception ex){
             System.out.println(ex.getLocalizedMessage());
-            mp.stop();
-            mp2.stop();
             System.exit(1);
         }
     }
